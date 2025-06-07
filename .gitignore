@@ -1,0 +1,29 @@
+# === Terraform-specific ===
+.terraform/               
+.terraform.lock.hcl       
+
+# === Terraform state ===
+*.tfstate                  
+*.tfstate.backup
+crash.log                
+override.tf              
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# === Plan files ===
+*.tfplan
+
+# === Secrets or local variables ===
+terraform.tfvars          
+terraform.tfvars.json
+*.auto.tfvars             
+
+# === OS / Editor / Tool junk ===
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.bak
+*.tmp

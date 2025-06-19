@@ -36,6 +36,20 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -65,7 +79,7 @@ data "aws_ami" "amazon_linux_arm" {
 
 resource "aws_instance" "chartmuseum" {
   ami                         = data.aws_ami.amazon_linux_arm.id
-  instance_type               = "t4g.micro"
+  instance_type               = "t3.small"
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
@@ -76,7 +90,18 @@ resource "aws_instance" "chartmuseum" {
               amazon-linux-extras install docker -y
               service docker start
               usermod -a -G docker ec2-user
-              docker run -d -p 80:8080 \
+              
+              # Wait for Docker to be ready
+              sleep 30
+              
+              # Pull the image first to avoid timeout issues
+              docker pull chartmuseum/chartmuseum:latest
+              
+              # Run ChartMuseum with better resource limits
+              docker run -d \
+                --name chartmuseum \
+                --restart unless-stopped \
+                -p 80:8080 \
                 -e STORAGE=amazon \
                 -e STORAGE_AMAZON_BUCKET=unir-tfm-chartmuseum-bucket \
                 -e STORAGE_AMAZON_REGION=${var.aws_region} \

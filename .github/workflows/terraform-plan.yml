@@ -10,7 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  plan-changes:
-    name: "Plan Changes"
-    uses: unir-tfm-devops/reusable-github-actions/.github/workflows/terraform-plan-aws.yml@main
+  terraform:
+    name: "TF"
+    uses: unir-tfm-devops/reusable-github-actions/.github/workflows/terraform-plan.yml@main
+    with:
+      cloud_provider: aws
     secrets: inherit
